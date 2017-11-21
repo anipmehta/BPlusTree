@@ -1,16 +1,15 @@
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by anip on 11/11/17.
  */
-public class LeafNode extends TreeNode {
+public class LeafNode{
     private ArrayList<KeyValue> data;
     private LeafNode left;
     private LeafNode right;
     private int min=0;
     private int max=0;
-    public void LeafNode(int m){
+    public LeafNode(int m){
         min = (int) Math.ceil(m/2);
         max = m-1;
         data = new ArrayList<KeyValue>();
@@ -25,7 +24,7 @@ public class LeafNode extends TreeNode {
         return false;
 
     }
-    public List<String> getValue(double key){
+    public String getValue(double key){
         for (KeyValue d : data){
             if(d.getKey()==key){
                 return d.getValue();
@@ -41,9 +40,27 @@ public class LeafNode extends TreeNode {
             return false;
         }
     }
-    public int getMin() {
-        return min;
-    }
+//    public TreeNode split(LeafNode leafNode, int m){
+//        int half = 0;
+//        if(leafNode.data.size()%2==0){
+//            half = leafNode.data.size();
+//        }
+//        else {
+//            half = leafNode.data.size()/2+1;
+//        }
+//        LeafNode leafNode1 = new LeafNode(m);
+//
+//        for(int i = leafNode.data.size()-half;i>0;i--){
+//            leafNode1.data.add(leafNode.data.remove(i));
+//        }
+//        InternalNode internalNode = new InternalNode(m);
+////        internalNode.addChildNodes(leafNode);
+////        internalNode.addChildNodes(leafNode1);
+//        return ;
+//    }
+//    public int getMin() {
+//        return min;
+//    }
     public int getMax() {
         return max;
     }
