@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  * Created by anip on 11/11/17.
  */
@@ -13,11 +15,6 @@ public class TreeNode {
     private TreeNode next;
     private boolean isLeaf = false;
     private boolean isRoot = false;
-    private String[] ranged;
-    private int cnt;
-    //    public boolean insert(KeyValue keyValue){
-//        return true;
-//    }
     public void addChildren(TreeNode treeNode) {
         children[childCount] = treeNode;
         childCount++;
@@ -26,7 +23,7 @@ public class TreeNode {
     public TreeNode(int m) {
         this.m = m;
     }
-
+    //For Assigning Memory to a Node whether it is a leaf or non leaf node
     public void initialize() {
         if (this.isLeaf()) {
             leafCount = 0;
@@ -48,21 +45,19 @@ public class TreeNode {
         }
         parent = previous = next = null;
     }
+
+    //Adding KeyValue to Leaf At Correct Position before splitting
     public void updateLeaf(KeyValue keyValue){
         for (int i = 0; i < keyValues.length; i++) {
             if (keyValues[i].getKey() == -1000) {
-                System.out.println("np" + 0);
                 keyValues[i] = keyValue;
                 leafCount++;
                 break;
 
             } else if (keyValue.getKey() == keyValues[i].getKey() && keyValues[i].getKey() != -1000) {
-                System.out.println("np" + 1);
-                System.out.println("Found Duplicate");
                 keyValues[i].addValue(keyValue.getValue());
                 break;
             } else if (keyValue.getKey() < keyValues[i].getKey() && keyValues[i].getKey() != -1000) {
-                System.out.println("np" + 2);
                 shift(i, keyValues);
                 keyValues[i] = keyValue;
                 leafCount++;
@@ -73,24 +68,20 @@ public class TreeNode {
         }
     }
 
+
+    //This Function is called everytime there is an Insert and is a Recursive Function and always returns the root of tree after insertion
     public TreeNode insert(KeyValue keyValue) {
         if (isLeaf() && notFull()) {
-            System.out.println("breaking" + keyValues);
             for (int i = 0; i < keyValues.length; i++) {
-                System.out.println("key"+keyValues[0].getKey());
                 if (keyValues[i].getKey() == -1000) {
-                    System.out.println("np" + 0);
                     keyValues[i] = keyValue;
                     leafCount++;
                     break;
 
                 } else if (keyValue.getKey() == keyValues[i].getKey() && keyValues[i].getKey() != -1000) {
-                    System.out.println("np" + 1);
-                    System.out.println("Found Duplicate");
                     keyValues[i].addValue(keyValue.getValue());
                     break;
                 } else if (keyValue.getKey() < keyValues[i].getKey() && keyValues[i].getKey() != -1000) {
-                    System.out.println("np" + 2);
                     shift(i, keyValues);
                     keyValues[i] = keyValue;
                     leafCount++;
@@ -110,6 +101,7 @@ public class TreeNode {
 
          else if (isLeaf() && !notFull()) {
             updateLeaf(keyValue);
+            //Splitting the Leaf Node after adding
            TreeNode parent = splitLeaf(keyValue);
 
            return check(parent,keyValue);
@@ -136,42 +128,6 @@ public class TreeNode {
         return check(parent.parent,keyValue);
     }
 
-//    private TreeNode addToParent(KeyValue keyValue) {
-//        if(this.parent==null){
-//            return this;
-//        }
-//        if(this.parent.parent==null){
-//            return parent;
-//        }
-//        else if(parent.notFull()){
-//            for(int i=0;i<parent.keys.length;i++){
-//                if(keyValue.getKey()<parent.keys[i] && parent.keys[i]!=-1000){
-//                    shift(i,parent);
-//                    parent.keys[i] = keyValue.getKey();
-//                    parent.children[i+1] = this;
-//                    parent.childCount++;
-//
-//                    break;
-//                }
-//                else if(parent.keys[i]==-1000){
-////                parent.keys[i] = treeNode.keyValues[0].getKey();
-////                parent.addChildren(treeNode);
-//                    parent.keys[i]=keyValue.getKey();
-//                    System.out.println("index"+i);
-////                parent.children[i-1].next = treeNode;
-//                    parent.children[i+1] = this;
-//                    parent.childCount++;
-//                    break;
-//                }
-//            }
-//            return parent;
-//
-//        }
-//        else if(!parent.notFull()){
-//           return splitInternalNode(keyValue).search(keyValue).insert(keyValue);
-//        }
-//        return this;
-//
     public boolean notFull() {
         if (isLeaf())
             return leafCount < m - 1;
@@ -179,7 +135,7 @@ public class TreeNode {
             return childCount <= m;
     }
 
-
+    //Used for creating space in keys arrays for a particular keyValue in Leaf
     public void shift(int i, KeyValue[] keyValues) {
         int length = keyValues.length - 1;
         int last = length;
@@ -195,10 +151,11 @@ public class TreeNode {
         }
     }
 
+    //Used for creating space in keys arrays for a particular index
+
     public void shift(int i, TreeNode parent) {
 
         for (int k = parent.keys.length-1; k > i; k--) {
-            System.out.println(k);
             parent.keys[k] = parent.keys[k - 1];
             parent.children[k+1] = parent.children[k];
         }
@@ -243,6 +200,8 @@ public class TreeNode {
     public void setNext(TreeNode next) {
         this.next = next;
     }
+
+    //Splits the two internal node and returns the parent of the split node
     public TreeNode splitInternalNode(KeyValue keyValue){
         int half = 0;
         if (m % 2 == 0) {
@@ -325,14 +284,7 @@ public class TreeNode {
         double temp = keys[half];
         keys[half] = -1000;
         childCount--;
-        System.out.println("Pivot Value"+temp);
-
-//        for(int k=1;k<treeNode.childCount;k++){
-//            treeNode.keys[k-1] = treeNode.keys[k];
-//            treeNode.keys[k]=-1000;
-//        }
-        this.setParent(parent);
-        treeNode.setParent(parent);
+        //Split Value is stored in temp
 
         TreeNode parent;
         if(this.parent==null){
@@ -347,36 +299,15 @@ public class TreeNode {
         else {
             parent = this.getParent();
             addToParent(parent, temp, treeNode);
-
-            for (int i = 0; i < parent.keys.length; i++) {
-                if (treeNode.keys[0] < parent.keys[i] && parent.keys[i] != -1000) {
-                    shift(i, parent);
-                    parent.keys[i] = treeNode.keys[0];
-                    parent.children[i + 1] = treeNode;
-                    parent.childCount++;
-
-                    break;
-                } else if (parent.keys[i] == -1000) {
-//                parent.keys[i] = treeNode.keyValues[0].getKey();
-//                parent.addChildren(treeNode);
-                    parent.keys[i] = treeNode.keys[0];
-                    System.out.println("index" + i);
-//                parent.children[i-1].next = treeNode;
-                    parent.children[i + 1] = treeNode;
-                    parent.childCount++;
-                    break;
-                }
-            }
         }
+        this.setParent(parent);
+        treeNode.setParent(parent);
             return parent;
         }
 
 
 
-//        parent.addChildren(this);
-
-
-
+    //Just add Double key to the parent before splitting
     private void addToParent(TreeNode parent, double temp, TreeNode treeNode) {
         for(int i=0;i<parent.keys.length;i++){
                 if(temp<parent.keys[i] && parent.keys[i]!=-1000){
@@ -388,10 +319,7 @@ public class TreeNode {
                     break;
                 }
                 else if(parent.keys[i]==-1000){
-//                parent.keys[i] = treeNode.keyValues[0].getKey();
-//                parent.addChildren(treeNode);
                     parent.keys[i]=temp;
-                    System.out.println("index"+i);
 //                parent.children[i-1].next = treeNode;
                     parent.children[i+1] = treeNode;
                     parent.childCount++;
@@ -400,6 +328,8 @@ public class TreeNode {
             }
     }
 
+
+    //Splits the leaf Node and return the parent of the the nodes after splitting it into two leaf nodes
     public TreeNode splitLeaf(KeyValue keyValue) {
         int half = 0;
         if (m % 2 == 0) {
@@ -418,6 +348,7 @@ public class TreeNode {
             keyValues[i] = defaultKeyValue();
         }
         treeNode.setPrevious(this);
+        treeNode.setNext(this.next);
         this.setNext(treeNode);
         TreeNode parent;
         if(this.parent==null) {
@@ -441,8 +372,6 @@ public class TreeNode {
 
                         break;
                     } else if (parent.keys[i] == -1000) {
-//                parent.keys[i] = treeNode.keyValues[0].getKey();
-//                parent.addChildren(treeNode);
                         parent.keys[i] = treeNode.keyValues[0].getKey();
                         parent.children[i + 1] = treeNode;
                         parent.childCount++;
@@ -455,14 +384,14 @@ public class TreeNode {
 
 
 
-//        parent.keys[parent.childCount-2]=treeNode.keyValues[0].getKey();
         this.setParent(parent);
         treeNode.setParent(parent);
         return parent;
-
-//            leafNode1.data.add(leafNode.data.remove(i));
-//        }
     }
+
+
+    //Searches Recursively to find the positon to insert the KeyValue
+    //Always return a leaf node
 
     public TreeNode search(KeyValue keyValue) {
         if (isLeaf()) {
@@ -475,10 +404,8 @@ public class TreeNode {
                     break;
 
                 } else if (keyValue.getKey() <= keys[i] && keys[i] != 1000) {
-//                    children[i + 1].search(keyValue);
                     k = i;
                     break;
-//                    return children[i].search(keyValue);
                 }
                 else if (keys[i] == -1000) {
 //                    children[i].search(keyValue);
@@ -498,7 +425,7 @@ public class TreeNode {
         if (isLeaf()) {
             for (int i = 0; i < keyValues.length; i++) {
                 if (key == keyValues[i].getKey()) {
-                    System.out.println("Found");
+                    //Same Key adding values to array
                     return keyValues[i].getValues();
                 }
             }
@@ -511,12 +438,10 @@ public class TreeNode {
                     break;
 
                 } else if (key < keys[i] && keys[i] != 1000) {
-//                    children[i + 1].search(keyValue);
                     k = i;
                     break;
-//                    return children[i].search(keyValue);
                 } else if (keys[i] == -1000) {
-//                    children[i].search(keyValue);
+
                     k = i;
                     break;
 
@@ -528,20 +453,14 @@ public class TreeNode {
         }
 
     }
-    public String[] find(Double min, Double max) {
-       if(ranged==null){
-           ranged = new String[1000];
-           cnt=0;
-       }
-        if (isLeaf()) {
-            for (int i = 0; i < keyValues.length; i++) {
-                if (min >=keyValues[i].getKey()) {
-//                    ranged[cnt]=keyValues[i].getValues();
 
-                    return traverseList(this,i,max);
-                }
-            }
-            return null;
+    //Searches for a ranged query and return the ouptut in StringBuffer with all key Value Pair
+    public StringBuffer find(Double min, Double max,StringBuffer str) {
+        if (isLeaf()) {
+           //Iterating on leaves double linked list
+
+                    return traverseList(this,0,min,max);
+
         } else {
             int k = 0;
             for (int i = 0; i < keys.length; i++) {
@@ -549,32 +468,57 @@ public class TreeNode {
                     k=i+1;
                     break;
 
-                } else if (min < keys[i] && keys[i] != 1000) {
-//                    children[i + 1].search(keyValue);
+                } else if (min <= keys[i] && keys[i] != 1000) {
                     k = i;
                     break;
-//                    return children[i].search(keyValue);
-                } else if (keys[i] == -1000) {
-//                    children[i].search(keyValue);
-                    k = i;
-                    break;
-
                 }
 
             }
-            return children[k].find(min);
+            return children[k].find(min,max,str);
 
         }
 
     }
-
-    private String[] traverseList(TreeNode treeNode, int index, Double max) {
-        String[] arr = new String[1000];
+    //Traverses the Doubly Linked List of leaves for ranged search
+    private StringBuffer traverseList(TreeNode treeNode, int index, Double min, Double max) {
+        StringBuffer str = new StringBuffer();
         int in=0;
         boolean flag=false;
-        while(treeNode.next!=null){
+        while(treeNode!=null){
             for(int k=index;k<treeNode.keyValues.length;k++){
-                arr[in] = treeNode.keyValues[k].getValue();
+                if(treeNode.keyValues[k].getKey()!=-1000 && treeNode.keyValues[k].getKey()>=min && treeNode.keyValues[k].getKey()<=max) {
+                    if(str.length()!=0) {
+                        str.append(",");
+                    }
+                    ArrayList<String> add= new ArrayList<String>();
+                            //Getting all the values there for this key
+                            String [] arr= treeNode.find(treeNode.keyValues[k].getKey());
+                            if(arr!=null) {
+                                for (int i = 0; i < arr.length; i++) {
+                                    if (arr[i] != null) {
+                                        str.append("(");
+                                        str.append(treeNode.keyValues[k].getKey());
+                                        str.append(",");
+                                        str.append(arr[i]);
+                                        str.append(")");
+                                    } else break;
+                                }
+
+
+                            }
+                    else {
+                                str.append("(");
+                                str.append(treeNode.keyValues[k].getKey());
+                                str.append(",");
+                                str.append(treeNode.keyValues[k].getValue());
+                                str.append(")");
+                            }
+
+
+
+
+
+                }
                 if(treeNode.keyValues[k].getKey()>max){
                     flag = true;
                     break;
@@ -584,10 +528,12 @@ public class TreeNode {
                 break;
             }
             treeNode = treeNode.next;
+            index = 0;
         }
-        return arr;
+        return str;
     }
-
+    //Default Value for Key = -1000;
+    //Default Value for Value = "";
     public KeyValue defaultKeyValue(){
         KeyValue keyValue = new KeyValue();
         keyValue.setKey(-1000);

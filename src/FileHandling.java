@@ -10,22 +10,25 @@ public class FileHandling {
     private ArrayList<KeyValue> keyValues;
     private ArrayList<Double> keys;
 
-    private ArrayList<RangedSearch> rangedSearches;
+    private ArrayList<String> output;
 
     public ArrayList<KeyValue> readFile(String name) throws IOException {
-        FileInputStream fstream = new FileInputStream("../ADS/src/input2.txt");
+        FileInputStream fstream = new FileInputStream(name);
         BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
         String strLine;
+
         int i=0;
 
 //Read File Line By Line
         while ((strLine = br.readLine()) != null)   {
-            // Print the content on the console
+
 
             if(i==0){
                 bpTree = new BPTree(Integer.parseInt(strLine));
                 this.setM(Integer.parseInt(strLine));
+                output = new ArrayList<String>();
             }
+            //Running insert query on Tree
             else {
                 if(strLine.contains("Insert")){
                     int length = strLine.length();
@@ -41,18 +44,60 @@ public class FileHandling {
                     bpTree.insert(keyValue);
 
                 }
+
+
+                //Running Search Queries on Tree
+
                 else if(strLine.contains("Search")){
                     int length = strLine.length();
                     String parsedString = strLine.substring(7,length-1);
-                                        System.out.println (parsedString);
+//                                        System.out.println (parsedString);
+                    BPTree old= bpTree;
 
                     if(parsedString.contains(",")){
                         String [] arr = parsedString.split(",");
-                        bpTree.search(Double.parseDouble(arr[0]), Double.parseDouble(arr[1]));
+                        StringBuffer str = bpTree.search(Double.parseDouble(arr[0]), Double.parseDouble(arr[1]));
+                        bpTree= old;
+                        if(str!=null)
+                        output.add(str.toString());
+
 //
                     }
+
+                    //Running Range Queries on Tree
+
                     else{
-                        bpTree.search(Double.parseDouble(parsedString));
+                          String[] out = bpTree.search(Double.parseDouble(parsedString));
+                        StringBuffer outputString = new StringBuffer();
+                        bpTree= old;
+                        if(out==null){
+                            outputString.append("Null");
+                        }
+                        else{
+                            if(out!=null){
+                                for(int k=0;k<out.length;k++){
+                                    if(out[k]==null){
+                                        break;
+                                    }
+
+                                    else if(out[k+1]==null){
+                                        outputString.append(out[k] + "");
+                                    }
+                                    else{
+
+                                        outputString.append(out[k]+",");
+                                    }
+//                                System.out.println(s);
+
+
+                                }
+
+                            }
+                        }
+
+                        output.add(outputString.toString());
+
+
                     }
 
                 }
@@ -67,12 +112,20 @@ public class FileHandling {
         return keyValues;
     }
 
-    public void writeFile(ArrayList<String> outputs,String name) throws IOException {
-        FileOutputStream fileOutputStream = new FileOutputStream("output.txt");
+    public void writeFile(String filename) throws IOException {
+
+        //Writing Output to file stored in an ArrayList output
+        File file = new File("output_file.txt");
+        file.createNewFile();
+        FileOutputStream fileOutputStream = new FileOutputStream(file);
+
         BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(fileOutputStream));
-        for(String string : outputs){
+        for(String string : output){
+//            string.charAt(string.length()-1) = "";
             bufferedWriter.write(string);
+            bufferedWriter.newLine();
         }
+        bufferedWriter.close();
     }
 
     public int getM() {
@@ -82,13 +135,7 @@ public class FileHandling {
     public void setM(int m) {
         this.m = m;
     }
-    public ArrayList<RangedSearch> getRangedSearches() {
-        return rangedSearches;
-    }
 
-    public ArrayList<Double> getKeys() {
-        return keys;
-    }
 
 
     public BPTree getBpTree() {

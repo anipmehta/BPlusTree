@@ -1,8 +1,9 @@
-import java.util.ArrayList;
 
 /**
  * Created by anip on 11/11/17.
  */
+
+//A KeyValue Class for Storing keys and arrays of values
 public class KeyValue{
     private double key;
     private String[] value;
@@ -17,9 +18,7 @@ public class KeyValue{
     }
 
 
-//    public ArrayList<String> getValue() {
-//        return value;
-//    }
+
 
     public void setValue(String value){
         if(this.value==null){
